@@ -1,0 +1,22 @@
+
+    
+    {
+    "tipoactuador" : {
+            "Temp1" : {
+                "IdTipoActuador" : "1",
+                "Descripcion" : "SENSOR"
+            },
+            "Temp2" : {
+                "IdTipoActuador" : "2",
+                "Descripcion" : "RELAY"
+            },
+            "Temp3" : {
+                 "IdTipoActuador" : "3",
+                "Descripcion" : "MOTOR"
+            }
+            "Temp4" : {
+                 "IdTipoActuador" : "4",
+                "Descripcion" : "BOMBA"
+            }
+        }
+    }

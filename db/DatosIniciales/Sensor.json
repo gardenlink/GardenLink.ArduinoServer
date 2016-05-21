@@ -1,0 +1,14 @@
+{
+    "sensor" : {
+            "SENSOR_1" : {
+                "IdSensor" : "1",
+                "IdDispositivo" : "001",
+                "Descripcion" : "Temperatura / Humedad",
+                "MarcaModelo" : "DHT11",
+                "Tipo" : "DHT11",
+                "Pin" : "1",
+                "EsPinAnalogo" : "false",
+                "Habilitado" : "true"
+            }
+        }
+    }

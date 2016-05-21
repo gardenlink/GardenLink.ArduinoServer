@@ -1,0 +1,16 @@
+{
+    "relay" : {
+            "RELE_1" : {
+                "IdRelay" : "1",
+                "IdDispositivo" : "001",
+                "Descripcion" : "Bomba",
+                "MarcaModelo" : "Olimex 4 Relay Shield",
+                "Tipo" : "Relay Shield",
+                "Pin" : "1",
+                "EsPinAnalogo" : "false",
+                "Habilitado" : "true",
+                "Activo" : "false",
+                "EsInverso" : "false"
+            }
+        }
+    }

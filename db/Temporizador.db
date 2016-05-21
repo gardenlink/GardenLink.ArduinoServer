@@ -1,0 +1,2 @@
+{"IdTemporizador":1,"IdDispositivo":"001","IdTipoActuador":1,"IdActuador":1,"Descripcion":"Temporizador","DuracionMinutos":1,"NumeroDias":10,"HorasActivacion":"11:12;11:14;11:16","Habilitado":"false","_id":"3kxApGXZMIgtpPZZ"}
+{"$$indexCreated":{"fieldName":"IdTemporizador","unique":true,"sparse":true}}

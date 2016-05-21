@@ -1,0 +1,3 @@
+{"Id":"002","Nombre":"ARDUINO_VENTANAS_1","Tipo":"MEGA","Ip":"192.168.0.11","Puerto":"80","Habilitado":true,"Estado":true,"FrecuenciaMuestreo":"60000","_id":"ddLL0zBZV9MS7ArQ"}
+{"Id":"001","Nombre":"ARDUINO_BOMBAS_1","Tipo":"UNO","Ip":"192.168.100.100","Puerto":"80","Habilitado":true,"Estado":true,"FrecuenciaMuestreo":"60000","_id":"v0IXwu1CoPkWro5e"}
+{"$$indexCreated":{"fieldName":"Id","unique":true,"sparse":true}}

@@ -1,0 +1,19 @@
+{
+            
+     "temporizador" : {
+            "Temp1" : {
+               "IdTemporizador" : "1",
+                "IdDispositivo" : "001",
+                "IdTipoActuador" : "1",
+                "IdActuador" : "1",
+                "Descripcion" : "Temporizador de prueba",
+                "Descripcion" : "Temporizador",
+                "DuracionMinutos" : "1",
+                "NumeroDias" : "10",
+                "HorasActivacion" : "11:12;11:14;11:16",
+                "Habilitado" : "false"
+            }
+        }
+            
+            
+    }

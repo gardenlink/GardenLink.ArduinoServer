@@ -1,0 +1,18 @@
+{
+    "motor" : {
+            "MOTOR_1" : {
+                "IdMotor" : "1",
+                "IdDispositivo" : "001",
+                "Descripcion" : "Motor Ventana",
+                "MarcaModelo" : "DF Robot",
+                "Tipo" : "Dual H Bridge v1.3",
+                "Pin" : "7,8",
+                "EsPinAnalogo" : "false",
+                "Habilitado" : "true",
+                "Posicion" : "0",
+                "DescripcionPosicion" : "0%",
+                "Accion" : "Detenido",
+                "Estado" : "0"
+            }
+        }
+    }

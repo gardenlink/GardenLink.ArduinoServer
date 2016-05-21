@@ -1,0 +1,2 @@
+{"IdRelay":1,"IdDispositivo":"001","Descripcion":"Bomba","MarcaModelo":"Olimex 4 Relay Shield","Tipo":"Relay Shield","Pin":"1","EsPinAnalogo":false,"Habilitado":true,"EsInverso":false,"_id":"lg8siK4BIOaRICx4"}
+{"$$indexCreated":{"fieldName":"IdRelay","unique":true,"sparse":true}}

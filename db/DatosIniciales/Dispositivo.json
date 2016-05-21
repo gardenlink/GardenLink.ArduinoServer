@@ -1,0 +1,24 @@
+{
+    "dispositivos" : {
+            "ARDUINO_BOMBAS" : {
+                "nombre" : "ARDUINO_BOMBAS_1",
+                "id" : "001",
+                "tipo" : "UNO",
+                "ip" : "192.168.100.100",
+                "puerto" : "80",
+                "habilitado" : "true",
+                "estado " : "false",
+                "FrecuenciaMuestreo" : "60000"
+            },
+            "ARDUINO_VENTANAS" : {
+                "nombre" : "ARDUINO_VENTANAS_1",
+                "id" : "002",
+                "tipo" : "MEGA",
+                "ip" : "192.168.100.101",
+                "puerto" : "80",
+                "habilitado" : "false",
+                "estado " : "false",
+                "FrecuenciaMuestreo" : "60000"
+            }
+        }
+    }

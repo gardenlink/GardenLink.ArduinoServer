@@ -1,0 +1,2 @@
+{"IdSensor":1,"IdDispositivo":"002","Descripcion":"Temperatura / Humedad","MarcaModelo":"DHT11","Tipo":"DHT11","Pin":"9","EsPinAnalogo":false,"Habilitado":true,"_id":"Ws5AXZpX9AbF7VwL"}
+{"$$indexCreated":{"fieldName":"IdSensor","unique":true,"sparse":true}}
