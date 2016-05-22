@@ -6,6 +6,14 @@ var async = require('async');
 var Auxiliares = require("./lib/util/Auxiliares.js");
 var auxiliares = new Auxiliares();
 
+var _DEBUG = true;
+
+var cmd_restart = "QREX";
+var cmd_network_reset = "QNRX";
+var cmd_status = "QSTX";
+
+
+
 // Configuracion de Winston (logging) para crear archivo de log diario
 // ej. log_file.log.2015-13-02
 // uso: logger.info("Registro de log", {extraData: 'texto logueado'});
@@ -19,7 +27,6 @@ transports.push(new winston.transports.DailyRotateFile({
 var logger = new winston.Logger({transports: transports});
 var _dirname = __dirname;
 
-var _DEBUG = true;
 
 //Fin config Winston
 // Modo de inicio de aplicacion:
@@ -155,6 +162,14 @@ io.on('connection', function(client){
 	  			respuesta += process.pid;
 	  			break;
 	  			
+	  		case "webclients":
+	  			respuesta += "clientes web conectados : " + webGuests.length;
+	  			break;
+	  			
+	  		case "tcpclients":
+	  			respuesta += "arduinos conectados : " + tcpGuests.length;
+	  			break;
+	  			
 	  			
 	  		case "uptime":
 	  			console.log("UPTIME : " + process.uptime() + " secconds");
@@ -162,7 +177,7 @@ io.on('connection', function(client){
 	  			break;
 	  			
 	  		case "help":
-	  			respuesta += "logs restart kill pid uptime help";
+	  			respuesta += "logs restart kill pid uptime webclients tcpclients help";
 	  			break;
 	  		
 	  		case "arduino":
@@ -173,12 +188,22 @@ io.on('connection', function(client){
 	  						respuesta += " reiniciando arduino...";
 	  						break;
 	  						
+	  					case "dhcprestart":
+	  						arduinoMsg = cmd_network_reset
+	  						respuesta += "comando ejecutado..";
+	  						break;
+	  						
 	  					case "help":
-	  						respuesta += "restart custom";
+	  						respuesta += "restart dhcprestart status custom";
 	  						break;
 	  						
 	  					case "custom":
 	  						arduinoMsg = comando[2];
+	  						respuesta += "comando ejecutado..";
+	  						break;
+	  						
+	  					case "status":
+	  						arduinoMsg = cmd_status;
 	  						respuesta += "comando ejecutado..";
 	  						break;
 	  						
@@ -199,16 +224,20 @@ io.on('connection', function(client){
 	  	}
 	  	
 	  	client.emit('console-response', respuesta);
+	  	
+	  	 //Comunico a los clientes arduino
+	    for (g in tcpGuests) {
+	        tcpGuests[g].write(arduinoMsg);
+	    }
+	  	
+	  	
   	}
     //var msg = { message: [client.sessionId, message] };
     //buffer.push(msg);
     //if (buffer.length > 15) buffer.shift();
     //client.broadcast.send(msg);
     
-    //Comunico a los clientes arduino
-    for (g in tcpGuests) {
-        tcpGuests[g].write(arduinoMsg);
-    }
+   
   });
 
   client.on('disconnect', function(){
@@ -301,8 +330,11 @@ tcpServer.on('connection',function(socket){
     //socket.send(socket.id);
     
     socket.on('data',function(data){
-        console.log('received on tcp socket: '+data);
+        console.log('received data on tcp socket: '+data);
+        logger.info('socket.on(data) : ' + data); 
         //socket.write('msg received\r\n');
+        
+        
         
         //send data to guest socket.io chat server
         for (g in io.clients) {
@@ -318,8 +350,7 @@ tcpServer.on('connection',function(socket){
 //var configEncendido = later.parse.recur().every(0.5).minute();
 //var x = later.setInterval(function() { Activar(dataProvider, logger); }, configEncendido);
 
-var cmd_restart = "QREX";
-var cmd_network_reset = "QNRX";
+
 
 
 
