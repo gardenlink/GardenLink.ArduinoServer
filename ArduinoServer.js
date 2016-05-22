@@ -19,6 +19,8 @@ transports.push(new winston.transports.DailyRotateFile({
 var logger = new winston.Logger({transports: transports});
 var _dirname = __dirname;
 
+var _DEBUG = true;
+
 //Fin config Winston
 // Modo de inicio de aplicacion:
 // 1.- Configuracion desde config.json. Requiere iniciar server con comando: 
@@ -446,7 +448,8 @@ function PrepararDataSensor(data) {
 console.log("Iniciando configuracion de temporizador...");
 var Temporizador = require("./lib/util/Temporizador.js");
 var tareas = new Temporizador(config, logger, dataProvider,tcpGuests, function(error, data) {
-	console.dir("Retorno: " + data);
+	
+	if (_DEBUG) console.dir("Retorno de funcion Temporizador " + data);
 	tareas.Iniciar();
 });
 
