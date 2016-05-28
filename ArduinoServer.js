@@ -341,11 +341,10 @@ tcpServer.on('connection',function(socket){
     socket.on('data',function(data){
         
         
-        console.log('socket.oon(data): ' + data);
+        console.log('socket.on(data): ' + data);
         logger.info('socket.on(data) : ' + data); 
         
-        console.log(socket);
-        //socket.write('msg received\r\n');
+        ProcesarDatos(data);
         
         
         //send data to guest socket.io chat server
