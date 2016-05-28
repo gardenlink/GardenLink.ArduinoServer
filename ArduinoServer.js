@@ -358,7 +358,7 @@ tcpServer.on('connection',function(socket){
 
 function ProcesarDatos(data) {
 	var keys = ['TipoDispositivo','Operacion','Id','Valor']
-	var values = data.split('|');
+	var values = data.toString().split('|');
 	var objeto = _.object(keys, values); // joins both arrays as an object
 	console.log(objeto);
 	
