@@ -5,12 +5,18 @@ var fs = require('fs'); //leer desde el filesystem
 var async = require('async');
 var Auxiliares = require("./lib/util/Auxiliares.js");
 var auxiliares = new Auxiliares();
+var _ = require("underscore");
 
 var _DEBUG = true;
 
-var cmd_restart = "QREX";
+var cmd_restart = "QRPX";
 var cmd_network_reset = "QNRX";
 var cmd_status = "QSTX";
+
+var ModelsDispositivo = require("./lib/dto/Dispositivo.js");
+var ModelsRelay = require("./lib/dto/Relay.js");
+var ModelsSensor = require("./lib/dto/Sensor.js");
+var ModelsMotor = require("./lib/dto/Motor.js");
 
 
 
@@ -86,22 +92,17 @@ server = http.createServer(function(req, res){
   var path = url.parse(req.url).pathname;
   switch (path){
     case '/':
-      res.writeHead(200, {'Content-Type': 'text/html'});
-      res.write('<h1>Welcome. Try the <a href="/arduino.html">Arduino</a> example.</h1>');
+      res.writeHead(200, {'Content-Type': 'application/json'});
+      res.write('<h1>Servidor de Socket</h1>');
       res.end();
       break;
-    case '/Sensor':
-    	res.end();
-    	break;
+   
+    case '/logs':
     
-    case '/json.js':
-    case '/arduino.html':
-      fs.readFile(__dirname + path, function(err, data){
-        if (err) return send404(res);
-        res.writeHead(200, {'Content-Type': path == 'json.js' ? 'text/javascript' : 'text/html'})
-        res.write(data, 'utf8');
-        res.end();
-      });
+       var contents = fs.readFileSync(__dirname +'/logs/log_file_socket.log.' + auxiliares.DateParse_yyyy_mm_dd(new Date()), {encoding: 'utf8'}).toString();
+       res.writeHead(200, {'Content-Type': 'text/json'});
+       res.write(contents);
+       res.end();
       break;
       
     default: send404(res);
@@ -178,6 +179,14 @@ io.on('connection', function(client){
 	  			
 	  		case "help":
 	  			respuesta += "logs restart kill pid uptime webclients tcpclients help";
+	  			break;
+	  			
+	  		case "debug":
+	  			//ProcesarDatos("R|E|1|1|");
+	  			if (comando[1]) {
+		  			console.log("Comando : " + comando[1]);
+		  			ProcesarDatos(comando[1]);
+	  			}
 	  			break;
 	  		
 	  		case "arduino":
@@ -330,10 +339,13 @@ tcpServer.on('connection',function(socket){
     //socket.send(socket.id);
     
     socket.on('data',function(data){
-        console.log('received data on tcp socket: '+data);
-        logger.info('socket.on(data) : ' + data); 
-        //socket.write('msg received\r\n');
         
+        
+        console.log('socket.oon(data): ' + data);
+        logger.info('socket.on(data) : ' + data); 
+        
+        console.log(socket);
+        //socket.write('msg received\r\n');
         
         
         //send data to guest socket.io chat server
@@ -344,6 +356,121 @@ tcpServer.on('connection',function(socket){
         }
     })
 });
+
+function ProcesarDatos(data) {
+	var keys = ['TipoDispositivo','Operacion','Id','Valor']
+	var values = data.split('|');
+	var objeto = _.object(keys, values); // joins both arrays as an object
+	console.log(objeto);
+	
+	
+	var model;
+	
+	switch(objeto.TipoDispositivo) {
+		case Dispositivos.Sensor:
+			model = new ModelsDispositivo();
+			
+			/*
+			model.Crear(doc.IdSensor,
+    				  doc.IdDispositivo, 
+    				  doc.Descripcion, 
+    				  doc.MarcaModelo, 
+    				  doc.Tipo, 
+    				  doc.Pin, 
+    				  doc.EsPinAnalogo,
+    				  doc.Habilitado);*/
+    					
+			
+			console.log("sensor");
+			break;
+			
+		case Dispositivos.Relay:
+			console.log("relay encontrado : ");
+			dataProvider.Cache(true, function(error, data ) {
+				var relays = data["Relays"];
+				for (var d in relays)
+			    {
+		          if (relays[d].IdRelay == parseInt(objeto.Id))
+		          {
+		          		var Activo = parseInt(objeto.Valor) == 1 ? true : false;
+		            	dataProvider.Relay().Save(
+		            				  relays[d].IdRelay,
+		            				  relays[d].IdDispositivo, 
+		            				  relays[d].Descripcion, 
+		            				  relays[d].MarcaModelo, 
+		            				  relays[d].Tipo, 
+		            				  relays[d].Pin,
+		            				  relays[d].EsPinAnalogo,
+		            				  relays[d].Habilitado,
+		            				  Activo,
+		            				  relays[d].EsInverso);
+		            				  
+		            	dataProvider.Medicion().Save(TipoActuador.Relay, relays[d].IdRelay, relays[d].IdDispositivo, Activo);
+		            	
+		          }
+			    }
+			});
+			
+			break;
+		
+		case Dispositivos.Motor:
+			console.log("motor encontrado : ");
+			dataProvider.Cache(true, function(error, data ) {
+				var motores = data["Motores"];
+				for (var d in motores)
+			    {
+			      console.dir(motores[d]);
+		          if (motores[d].IdMotor == parseInt(objeto.Id))
+		          {
+		          		
+		          		console.log("Valor :" + objeto.Valor + " Operacion : " + objeto.Operacion + " Estado : " + EstadosMotor[objeto.Operacion]);
+		          		
+		            	dataProvider.Motor().Save(
+		            				 motores[d].IdMotor, 
+		            				 motores[d].IdDispositivo, 
+		            				 motores[d].Descripcion, 
+		            				 motores[d].MarcaModelo, 
+		            				 motores[d].Tipo,
+		            				 motores[d].Pin,
+		            				 motores[d].EsPinAnalogo, 
+		            				 motores[d].Habilitado,
+		            				 objeto.Valor,
+		            				 objeto.Operacion,
+		            				 EstadosMotor[objeto.Operacion]);
+		            				 
+								            				  
+		            	dataProvider.Medicion().Save(TipoActuador.Motor, motores[d].IdMotor, motores[d].IdDispositivo, objeto.Valor);
+		            	
+		          }
+			    }
+			});
+			
+			break;
+	}
+	
+}
+
+function BuscarObjeto(tipo, id) {
+	var datos = dataProvider.Consolidado(false);
+};
+
+function BuscarActuador(id, actuadores)
+    {
+      var found = null;
+      for (var d in actuadores)
+      {
+          if (actuadores[d].Id == id)
+          {
+            found = actuadores[d];
+          }
+      }
+
+      if (!found)
+        console.log("Temporizador.BuscarActuador: actuador no encontrado");
+
+      return found;
+    }
+
 
 
 //var later = require('later'); // gestion de tarea
@@ -460,6 +587,20 @@ var Operaciones = {
 		Posicion : "P"
 	}
 };
+
+var EstadosMotor = {
+	"D" : 0,
+	"A" : 1,
+	"R" : 2
+}
+
+//TODO: Incorporar al modelo
+var TipoActuador = {
+	Sensor : 1,
+	Relay : 2,
+	Motor : 3,
+	Bomba : 4
+}
 
 
 
