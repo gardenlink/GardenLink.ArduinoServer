@@ -373,7 +373,7 @@ function ProcesarDatos(data) {
 				var dispositivos = data["Dispositivos"];
 				for (var d in dispositivos){
 					 if (dispositivos[d].Id == parseInt(objeto.Id)) {
-					 	dataProvider.Device().Crear(
+					 	dataProvider.Device().Save(
 					 		dispositivos[d].Id,
 					 		dispositivos[d].Nombre,
 					 		dispositivos[d].Tipo,
