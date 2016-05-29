@@ -409,27 +409,31 @@ function ProcesarDatos(data) {
 		case Dispositivos.Relay:
 			console.log("relay encontrado : ");
 			dataProvider.Cache(true, function(error, data ) {
-				var relays = data["Relays"];
-				for (var d in relays)
-			    {
-		          if (relays[d].IdRelay == parseInt(objeto.Id))
-		          {
-		          		var Activo = parseInt(objeto.Valor) == 1 ? true : false;
-		            	dataProvider.Relay().Save(
-		            				  relays[d].IdRelay,
-		            				  relays[d].IdDispositivo, 
-		            				  relays[d].Descripcion, 
-		            				  relays[d].MarcaModelo, 
-		            				  relays[d].Tipo, 
-		            				  relays[d].Pin,
-		            				  relays[d].EsPinAnalogo,
-		            				  relays[d].Habilitado,
-		            				  Activo,
-		            				  relays[d].EsInverso);
-		            				  
-		            	dataProvider.Medicion().Save(TipoActuador.Relay, relays[d].IdRelay, relays[d].IdDispositivo, objeto.Valor);
-		            	
-		          }
+				if (error){ console.log(error) }
+				else {
+				
+					var relays = data["Relays"];
+					for (var d in relays)
+				    {
+			          if (relays[d].IdRelay == parseInt(objeto.Id))
+			          {
+			          		var Activo = parseInt(objeto.Valor) == 1 ? true : false;
+			            	dataProvider.Relay().Save(
+			            				  relays[d].IdRelay,
+			            				  relays[d].IdDispositivo, 
+			            				  relays[d].Descripcion, 
+			            				  relays[d].MarcaModelo, 
+			            				  relays[d].Tipo, 
+			            				  relays[d].Pin,
+			            				  relays[d].EsPinAnalogo,
+			            				  relays[d].Habilitado,
+			            				  Activo,
+			            				  relays[d].EsInverso);
+			            				  
+			            	dataProvider.Medicion().Save(TipoActuador.Relay, relays[d].IdRelay, relays[d].IdDispositivo, objeto.Valor);
+			            	
+			          }
+				    }
 			    }
 			});
 			
