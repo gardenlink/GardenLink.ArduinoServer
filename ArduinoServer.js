@@ -396,7 +396,7 @@ function ProcesarDatos(data) {
 			    {
 		          if (sensores[d].IdSensor == parseInt(objeto.Id))
 		          {
-		          		console.log("Grabando medicion sensor : " + Objeto.Id);
+		          		console.log("Grabando medicion sensor : " + objeto.Id);
 		            	dataProvider.Medicion().Save(TipoActuador.Sensor, sensores[d].IdSensor, sensores[d].IdDispositivo, objeto.Valor);
 		          }
 			    }
