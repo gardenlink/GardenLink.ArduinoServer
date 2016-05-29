@@ -390,13 +390,13 @@ function ProcesarDatos(data) {
 			break;
 		
 		case Dispositivos.Sensor:
-			
 			dataProvider.Cache(true, function(error, data ) {
 				var sensores = data["Sensores"];
 				for (var d in sensores)
 			    {
 		          if (sensores[d].IdSensor == parseInt(objeto.Id))
 		          {
+		          		console.log("Grabando medicion sensor : " + Objeto.Id);
 		            	dataProvider.Medicion().Save(TipoActuador.Sensor, sensores[d].IdSensor, sensores[d].IdDispositivo, objeto.Valor);
 		          }
 			    }
