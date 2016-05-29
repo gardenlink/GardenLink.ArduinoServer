@@ -344,8 +344,7 @@ tcpServer.on('connection',function(socket){
         console.log('socket.on(data): ' + data);
         logger.info('socket.on(data) : ' + data); 
         
-        ProcesarDatos(data);
-        
+        /*
         
         //send data to guest socket.io chat server
         for (g in io.clients) {
@@ -353,6 +352,7 @@ tcpServer.on('connection',function(socket){
             client.send({message:["arduino",data.toString('ascii',0,data.length)]});
             
         }
+        */
     })
 });
 
