@@ -356,31 +356,54 @@ tcpServer.on('connection',function(socket){
     })
 });
 
+
 function ProcesarDatos(data) {
 	var keys = ['TipoDispositivo','Operacion','Id','Valor']
 	var values = data.toString().split('|');
 	var objeto = _.object(keys, values); // joins both arrays as an object
 	console.log(objeto);
 	
-	
 	var model;
 	
 	switch(objeto.TipoDispositivo) {
+		
+		case Dispositivos.Board:
+			
+			dataProvider.Cache(true, function(error, data ) {
+				var dispositivos = data["Dispositivos"];
+				for (var d in dispositivos){
+					 if (dispositivos[d].Id == parseInt(objeto.Id)) {
+					 	dataProvider.Device().Crear(
+					 		dispositivos[d].Id,
+					 		dispositivos[d].Nombre,
+					 		dispositivos[d].Tipo,
+					 		objeto.Valor,
+					 		dispositivos[d].Puerto,
+					 		dispositivos[d].Habilitado,
+					 		true,
+					 		dispositivos[d].FrecuenciaMuestreo
+					 	);
+					 }
+				}
+			});
+			
+			break;
+		
 		case Dispositivos.Sensor:
-			model = new ModelsDispositivo();
 			
-			/*
-			model.Crear(doc.IdSensor,
-    				  doc.IdDispositivo, 
-    				  doc.Descripcion, 
-    				  doc.MarcaModelo, 
-    				  doc.Tipo, 
-    				  doc.Pin, 
-    				  doc.EsPinAnalogo,
-    				  doc.Habilitado);*/
-    					
+			dataProvider.Cache(true, function(error, data ) {
+				var sensores = data["Sensores"];
+				for (var d in sensores)
+			    {
+		          if (sensores[d].IdSensor == parseInt(objeto.Id))
+		          {
+		            	dataProvider.Medicion().Save(TipoActuador.Sensor, sensores[d].IdSensor, sensores[d].IdDispositivo, objeto.Valor);
+		          }
+			    }
+			});
 			
-			console.log("sensor");
+		
+			
 			break;
 			
 		case Dispositivos.Relay:
@@ -404,7 +427,7 @@ function ProcesarDatos(data) {
 		            				  Activo,
 		            				  relays[d].EsInverso);
 		            				  
-		            	dataProvider.Medicion().Save(TipoActuador.Relay, relays[d].IdRelay, relays[d].IdDispositivo, Activo);
+		            	dataProvider.Medicion().Save(TipoActuador.Relay, relays[d].IdRelay, relays[d].IdDispositivo, objeto.Valor);
 		            	
 		          }
 			    }
@@ -562,7 +585,8 @@ function Activar(dataProvider, logger) {
 var Dispositivos = {
 	Sensor : "S",
 	Relay : "R",
-	Motor : "M"
+	Motor : "M",
+	Board : "B"
 };
 
 var Operaciones = {
