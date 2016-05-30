@@ -344,6 +344,8 @@ tcpServer.on('connection',function(socket){
         console.log('socket.on(data): ' + data);
         logger.info('socket.on(data) : ' + data); 
         
+        ProcesarDatos(data);
+        
         /*
         
         //send data to guest socket.io chat server
