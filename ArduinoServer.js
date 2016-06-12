@@ -8,6 +8,7 @@ var auxiliares = new Auxiliares();
 var _ = require("underscore");
 
 var _DEBUG = true;
+var _MOCK = true;
 
 var cmd_restart = "QRPX";
 var cmd_network_reset = "QNRX";
@@ -129,10 +130,42 @@ var io = io.listen(server)
 io.on('connection', function(client){
   client.send({ buffer: buffer });
   client.broadcast.send({ announcement: client.sessionId + ' connected' });
-  console.log("connection");
+  console.log("connection from client: ");
   
   webGuests.push(client);
   
+  
+  
+  //Evento para manejar peticiones desde el controlador de apps
+  client.on('servicemessage', function(message) {
+  		var arduinoMsg = "";
+  		console.log("servicemessage.COMMAND: <" + message + ">");
+   		var comando = message;
+  		if (comando.length > 0) {
+  			if (_MOCK) {
+	  			console.log(arduinoMsg);
+	  			
+	  			console.log("COMANDO : " + comando[1]);
+	  			var activo;
+	  			if (comando[1] == "E") activo = 1;
+	  			if (comando[1] == "A") activo = 0;
+	  			var ms = "R|" + comando[1]+"|"+ comando[2] + "|" + activo;
+	  			console.log(" MOCK : " + ms);
+	  			ProcesarDatos(ms);
+  			}
+  		}
+  		else
+  		{
+	  		 for (g in tcpGuests) {
+		        tcpGuests[g].write(comando);
+		    }
+	    }
+  		
+  		
+  		
+  });
+  
+  //Evento para manejar peticiones desde consola
   client.on('message', function(message){
   	
   	console.log("COMMAND: <" + message + ">");
@@ -346,15 +379,6 @@ tcpServer.on('connection',function(socket){
         
         ProcesarDatos(data);
         
-        /*
-        
-        //send data to guest socket.io chat server
-        for (g in io.clients) {
-            var client = io.clients[g];
-            client.send({message:["arduino",data.toString('ascii',0,data.length)]});
-            
-        }
-        */
     })
 });
 
@@ -375,16 +399,22 @@ function ProcesarDatos(data) {
 				var dispositivos = data["Dispositivos"];
 				for (var d in dispositivos){
 					 if (dispositivos[d].Id == parseInt(objeto.Id)) {
+					 
+					 	dispositivos[d].Estado = true;
+					 	dispositivos[d].Ip = objeto.Valor;
+					 
 					 	dataProvider.Device().Save(
 					 		dispositivos[d].Id,
 					 		dispositivos[d].Nombre,
 					 		dispositivos[d].Tipo,
-					 		objeto.Valor,
+					 		dispositivos[d].Ip,
 					 		dispositivos[d].Puerto,
 					 		dispositivos[d].Habilitado,
-					 		true,
+					 		dispositivos[d].Estado,
 					 		dispositivos[d].FrecuenciaMuestreo
 					 	);
+					 	
+					 	EnviarRespuestaWebClients(dispositivos[d]);
 					 }
 				}
 			});
@@ -400,6 +430,8 @@ function ProcesarDatos(data) {
 		          {
 		          		console.log("Grabando medicion sensor : " + objeto.Id);
 		            	dataProvider.Medicion().Save(TipoActuador.Sensor, sensores[d].IdSensor, sensores[d].IdDispositivo, objeto.Valor);
+		            	
+		            	EnviarRespuestaWebClients(objeto.Valor);
 		          }
 			    }
 			});
@@ -409,7 +441,6 @@ function ProcesarDatos(data) {
 			break;
 			
 		case Dispositivos.Relay:
-			console.log("relay encontrado : ");
 			dataProvider.Cache(true, function(error, data ) {
 				if (error){ console.log(error) }
 				else {
@@ -420,6 +451,7 @@ function ProcesarDatos(data) {
 			          if (relays[d].IdRelay == parseInt(objeto.Id))
 			          {
 			          		var Activo = parseInt(objeto.Valor) == 1 ? true : false;
+			          		relays[d].Activo = Activo;
 			            	dataProvider.Relay().Save(
 			            				  relays[d].IdRelay,
 			            				  relays[d].IdDispositivo, 
@@ -429,10 +461,14 @@ function ProcesarDatos(data) {
 			            				  relays[d].Pin,
 			            				  relays[d].EsPinAnalogo,
 			            				  relays[d].Habilitado,
-			            				  Activo,
+			            				  relays[d].Activo,
 			            				  relays[d].EsInverso);
 			            				  
 			            	dataProvider.Medicion().Save(TipoActuador.Relay, relays[d].IdRelay, relays[d].IdDispositivo, objeto.Valor);
+			            	
+			            	 //send data to guest web clients
+			            	 console.log("Envio Respuesta..");
+							EnviarRespuestaWebClients(relays[d]);
 			            	
 			          }
 				    }
@@ -452,7 +488,9 @@ function ProcesarDatos(data) {
 		          {
 		          		
 		          		console.log("Valor :" + objeto.Valor + " Operacion : " + objeto.Operacion + " Estado : " + EstadosMotor[objeto.Operacion]);
-		          		
+		          		motores[d].Posicion = objeto.Valor;
+		          		motores[d].Accion = objeto.Operacion;
+		          		motores[d].Estado = EstadosMotor[objeto.Operacion];
 		            	dataProvider.Motor().Save(
 		            				 motores[d].IdMotor, 
 		            				 motores[d].IdDispositivo, 
@@ -462,10 +500,11 @@ function ProcesarDatos(data) {
 		            				 motores[d].Pin,
 		            				 motores[d].EsPinAnalogo, 
 		            				 motores[d].Habilitado,
-		            				 objeto.Valor,
-		            				 objeto.Operacion,
-		            				 EstadosMotor[objeto.Operacion]);
+		            				 motores[d].Posicion,
+		            				 motores[d].Accion,
+		            				 motores[d].Estado);
 		            				 
+						EnviarRespuestaWebClients(motores[d]);
 								            				  
 		            	dataProvider.Medicion().Save(TipoActuador.Motor, motores[d].IdMotor, motores[d].IdDispositivo, objeto.Valor);
 		            	
@@ -477,6 +516,17 @@ function ProcesarDatos(data) {
 	}
 	
 }
+
+function EnviarRespuestaWebClients(data) {
+	
+	    for (g in webGuests) {
+	        var client = webGuests[g];
+	        //client.send({message:["arduino",data.toString('ascii',0,data.length)]});
+	        client.emit('webclient-response', data);
+	    }
+
+};
+
 
 function BuscarObjeto(tipo, id) {
 	var datos = dataProvider.Consolidado(false);
