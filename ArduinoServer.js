@@ -8,7 +8,7 @@ var auxiliares = new Auxiliares();
 var _ = require("underscore");
 
 var _DEBUG = true;
-var _MOCK = true;
+var _MOCK = false;
 
 var cmd_restart = "QRPX";
 var cmd_network_reset = "QNRX";
@@ -143,7 +143,7 @@ io.on('connection', function(client){
    		var comando = message;
   		if (comando.length > 0) {
   			if (_MOCK) {
-	  			console.log(arduinoMsg);
+	  			
 	  			
 	  			console.log("COMANDO : " + comando[1]);
 	  			var activo;
@@ -153,13 +153,14 @@ io.on('connection', function(client){
 	  			console.log(" MOCK : " + ms);
 	  			ProcesarDatos(ms);
   			}
-  		}
-  		else
-  		{
-	  		 for (g in tcpGuests) {
-		        tcpGuests[g].write(comando);
+  			else
+	  		{
+		  		 for (g in tcpGuests) {
+			        tcpGuests[g].write(comando);
+			    }
 		    }
-	    }
+  		}
+  		
   		
   		
   		
