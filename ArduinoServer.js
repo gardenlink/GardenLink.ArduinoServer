@@ -452,6 +452,10 @@ function ProcesarDatos(data) {
 			          {
 			          		var Activo = parseInt(objeto.Valor) == 1 ? true : false;
 			          		relays[d].Activo = Activo;
+			          		
+			          		console.log("VALOR RELAY **");
+			          		console.dir(relays[d]);
+			          		
 			            	dataProvider.Relay().Save(
 			            				  relays[d].IdRelay,
 			            				  relays[d].IdDispositivo, 
